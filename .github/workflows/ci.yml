@@ -38,6 +38,9 @@ jobs:
         with:
           gradle-version: 7.6
           arguments: refreshDependences
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v3
@@ -46,3 +49,5 @@ jobs:
           arguments: build
         env:
           ADEMPIERE_LIBRARY_VERSION: 'build'
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

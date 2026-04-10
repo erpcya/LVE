@@ -23,15 +23,15 @@ repositories {
     maven {
 		url = "https://maven.pkg.github.com/erpya/Repository"
         credentials {
-        	username = System.properties['deploy.user'] ?: findProperty("deployUsername")
-            password = System.properties['deploy.token'] ?: findProperty("deployPassword")
+        	username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?: System.getenv("GITHUB_ACTOR")
+            password = findProperty("deployPassword") ?: System.properties['deploy.token'] ?: System.getenv("GITHUB_TOKEN")
 		}
 	}
     maven {
         url = uri("https://maven.pkg.github.com/erpcya/withholding-engine")
         credentials {
-            username = System.properties['deploy.user'] ?: findProperty("deployUsername")
-            password = System.properties['deploy.token'] ?: findProperty("deployPassword")
+            username = findProperty("deployUsername") ?: System.properties['deploy.user'] ?: System.getenv("GITHUB_ACTOR")
+            password = findProperty("deployPassword") ?: System.properties['deploy.token'] ?: System.getenv("GITHUB_TOKEN")
         }
     }
 }
