@@ -20,7 +20,7 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.Optional;
 
-import org.adempiere.core.domains.models.I_C_Invoice;
+import org.compiere.model.I_C_Invoice;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MCurrency;
 import org.compiere.model.MDocType;

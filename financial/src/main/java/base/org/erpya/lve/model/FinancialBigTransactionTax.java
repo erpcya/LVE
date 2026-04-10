@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Properties;
 
-import org.adempiere.core.domains.models.I_C_Payment;
+import org.compiere.model.I_C_Payment;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MBank;
 import org.compiere.model.MBankAccount;

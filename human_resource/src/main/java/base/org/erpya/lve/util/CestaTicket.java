@@ -22,7 +22,11 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -31,7 +35,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-import org.adempiere.core.domains.models.X_RV_HR_ProcessDetail;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MLocation;
@@ -41,9 +44,10 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.TimeUtil;
 import org.compiere.util.Util;
-import org.eevolution.hr.model.MHREmployee;
-import org.spin.hr.util.AbstractPayrollReportExport;
-import org.spin.pr.model.MHRProcessReport;
+import org.eevolution.model.MHREmployee;
+import org.spin.model.MHRProcessReport;
+import org.spin.model.X_RV_HR_ProcessDetail;
+import org.spin.util.AbstractPayrollReportExport;
 
 /**
  * @author Yamel Senih, ysenih@erpya.com, ERPCyA http://www.erpya.com
@@ -244,15 +248,21 @@ public class CestaTicket extends AbstractPayrollReportExport {
 					+ " LEFT JOIN AD_User usr ON (bp.C_BPartner_ID = usr.C_BPartner_ID)"
 					+ " WHERE bp.C_BPartner_ID = ? "
 					+ "	AND bp.IsEmployee = 'Y'";
-			List<Object> parameters = List.of(businessPartnerId);
-			DB.runResultSet(null, sql, parameters, resultSet -> {
-				if(resultSet.next()) {
-					phone = processContact(resultSet.getString("Phone"));
-					email = processContact(resultSet.getString("EMail"));
+			PreparedStatement pstmt = null;
+			ResultSet rs = null;
+			try {
+				pstmt = DB.prepareStatement(sql, null);
+				pstmt.setInt(1, businessPartnerId);
+				rs = pstmt.executeQuery();
+				if(rs.next()) {
+					phone = processContact(rs.getString("Phone"));
+					email = processContact(rs.getString("EMail"));
 				}
-			}).onFailure(throwable -> {
-				throw new AdempiereException(throwable);
-			});
+			} catch (Exception e) {
+				s_log.log(Level.WARNING, "Error loading contact values", e);
+			} finally {
+				DB.close(rs, pstmt);
+			}
 		}
 		
 		public static Employee newInstance(int businessPartnerId) {

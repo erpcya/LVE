@@ -1,41 +1,55 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'de.undercouch:gradle-download-task:4.1.1'
+	}
+}
+
 plugins {
 	id 'java-library'
 	id 'maven-publish'
 	id 'signing'
 }
 
-sourceCompatibility = 1.11
-def baseVersion = '3.9.4'
-def baseGroupId = 'io.github.adempiere'
+apply plugin: 'de.undercouch.download'
+
+def adempiereRelease = '3.9.3-rs-4.3'
 
 repositories {
     mavenLocal()
     mavenCentral()
+    maven {
+		url = "https://maven.pkg.github.com/erpya/Repository"
+        credentials {
+        	username = System.properties['deploy.user'] ?: findProperty("deployUsername")
+            password = System.properties['deploy.token'] ?: findProperty("deployPassword")
+		}
+	}
+    maven {
+        url = uri("https://maven.pkg.github.com/erpcya/withholding-engine")
+        credentials {
+            username = System.properties['deploy.user'] ?: findProperty("deployUsername")
+            password = System.properties['deploy.token'] ?: findProperty("deployPassword")
+        }
+    }
 }
 
 allprojects {
     tasks.withType(Javadoc).all { enabled = false }
 }
 
-sourceCompatibility = 1.11
-targetCompatibility = 1.11
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 dependencies {
-   api fileTree(
-        dir: 'lib',
-        include: [
-            '*.jar'
-        ]
-    )
-    //	ADempiere Core
-    api "${baseGroupId}:human-resource-and-payroll:${baseVersion}"
-	api "${baseGroupId}:store:${baseVersion}"
-	// https://search.maven.org/artifact/javax.mail/javax.mail-api/1.6.2/jar
-	api 'javax.mail:javax.mail-api:1.6.2'
-	// http://xml.apache.org/commons/#external
-	api 'xml-apis:xml-apis:2.0.2'
-	api "${baseGroupId}:withholding-engine:adempiere-3.9.4-1.3.2"
-	api 'io.vavr:vavr:0.10.4'
+    implementation fileTree(dir: 'lib', include: ['*.jar'])
+    implementation fileTree(dir: 'dependences', include: ['*.jar'])
+    implementation files("dependences/classes/")
+    compileOnly fileTree(dir: 'dependences', include: ['*.jar'])
+    implementation 'io.github.adempiere:withholding-engine:adempiere-3.9.3-1.3.6'
+    compileOnly 'io.github.adempiere:withholding-engine:adempiere-3.9.3-1.3.6'
 }
 
 sourceSets {
@@ -51,9 +65,8 @@ java {
     withSourcesJar()
 }
 
-
 def entityType = 'LVE'
-group = "io.github.adempiere"
+group = "io.github.erpcya"
 version = findProperty("deployVersion") ?: "local-1.0.0"
 
 jar {
@@ -79,13 +92,13 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
 			groupId = group
-			artifactId = 'location-venezuela'
+			artifactId = 'lve'
 			version = version
            	from components.java
            	pom {
                 name = 'ADempiere Venezuela Location'
                 description = 'This library have all related to ADempiere Venezuela Location own Laws for Venezuela'
-                url = 'http://erpya.com/'
+                url = 'http://github.com/erpcya/LVE'
                 licenses {
                     license {
                         name = 'GNU General Public License v3.0'
@@ -100,18 +113,63 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://github.com/adempiere/lve.git'
-                    developerConnection = 'scm:git:ssh://github.com/adempiere/lve.git'
-                    url = 'http://github.com/adempiere/lve'
+                    connection = 'scm:git:git://github.com/erpcya/LVE.git'
+                    developerConnection = 'scm:git:ssh://github.com/erpcya/LVE.git'
+                    url = 'http://github.com/erpcya/LVE'
                 }
             }
 		}
-	}
+    }
 }
 
 
 task cleanBuildPublishLocal(type: GradleBuild) {
 	tasks = ['clean', 'build', 'publishToMavenLocal']
+}
+
+task refreshDependences(){
+	file('dependences').mkdirs()
+	file('dependences/tmp/').mkdirs()
+	file('dependences/webuiClass').mkdirs()
+	doLast {
+		download {
+            src 'http://github.com/erpcya/adempiere/releases/download/' + adempiereRelease + '/Adempiere_393LTS.tar.gz'
+            dest 'dependences/tmp/Adempiere_393LTS.tar.gz'
+            overwrite false
+        }
+        
+        copy {
+            from tarTree(resources.gzip('dependences/tmp/Adempiere_393LTS.tar.gz'))
+            into 'dependences/tmp'
+        }
+        
+        copy {
+            from zipTree('dependences/tmp/Adempiere/lib/webui.war')
+            into 'dependences/webuiClass/'
+        }
+        
+        copy {
+        	from "dependences/tmp/Adempiere/lib"
+        	into "dependences"
+        	include "*.jar"
+    	}
+    	copy {
+            from fileTree('dependences/tmp/Adempiere/packages/').filter { it.isFile()}
+            into "dependences"
+            include "*.jar"
+    	}
+    	copy {
+            from "dependences/webuiClass/WEB-INF/lib"
+            into "dependences"
+            include "*.jar"
+    	}
+    	copy {
+            from "dependences/webuiClass/WEB-INF/classes"
+            into "dependences/classes"
+    	}
+    	file('dependences/tmp/').deleteDir()
+    	file('dependences/webuiClass/').deleteDir()
+	}
 }
 
 

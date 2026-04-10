@@ -5,7 +5,6 @@ name: Publish With gradle to maven central
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the develop branch
   release:
     types: 
       - published
@@ -13,33 +12,6 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 
-  publish-sonatype:
-    name: Publish Project (Sonatype)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v4
-
-      - name: Set up Java JDK 11
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-package: 'jdk'
-          java-version: 11
-          architecture: x64
-
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v3
-        with:
-          gradle-version: 8.0.2
-          arguments: publish
-        env:
-          ORG_GRADLE_PROJECT_deployVersion: ${{ github.event.release.tag_name }}
-          ORG_GRADLE_PROJECT_deployPublishUrl: ${{ secrets.DEPLOY_PUBLISH_SONATYPE_URL }}
-          ORG_GRADLE_PROJECT_deploySigningKey: ${{ secrets.PGP_SECRET }}
-          ORG_GRADLE_PROJECT_deploySigningPassword: ${{ secrets.PGP_PASSPHRASE }}
-          ORG_GRADLE_PROJECT_deployUsername: ${{ secrets.OSSRH_USERNAME }}
-          ORG_GRADLE_PROJECT_deployPassword: ${{ secrets.OSSRH_TOKEN }}
   publish-github:
     name: Publish Project (Github)
     runs-on: ubuntu-latest
@@ -47,23 +19,30 @@ jobs:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Set up Java JDK 11
+      - name: Set up Java JDK 8
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-package: 'jdk'
-          java-version: 11
+          java-version: '8'
           architecture: x64
+
+      - name: Download dependencies
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: 7.6
+          arguments: refreshDependences
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build with Gradle
         uses: gradle/gradle-build-action@v3
         with:
-          gradle-version: 8.0.2
+          gradle-version: 7.6
           arguments: publish
         env:
           ORG_GRADLE_PROJECT_deployVersion: ${{ github.event.release.tag_name }}
-          ORG_GRADLE_PROJECT_deployPublishUrl: ${{ secrets.DEPLOY_PUBLISH_GITHUB_URL }}
-          ORG_GRADLE_PROJECT_deploySigningKey: ${{ secrets.PGP_SECRET }}
-          ORG_GRADLE_PROJECT_deploySigningPassword: ${{ secrets.PGP_PASSPHRASE }}
+          ORG_GRADLE_PROJECT_deployPublishUrl: https://maven.pkg.github.com/erpcya/LVE
           ORG_GRADLE_PROJECT_deployUsername: "${{ github.actor }}"
-          ORG_GRADLE_PROJECT_deployPassword: "${{ secrets.DEPLOY_TOKEN }}"
+          ORG_GRADLE_PROJECT_deployPassword: "${{ secrets.GITHUB_TOKEN }}"

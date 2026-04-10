@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.adempiere.core.domains.models.I_C_Invoice;
+import org.compiere.model.I_C_Invoice;
 import org.adempiere.exceptions.AdempiereException;
 import org.compiere.model.MClient;
 import org.compiere.model.MConversionRate;

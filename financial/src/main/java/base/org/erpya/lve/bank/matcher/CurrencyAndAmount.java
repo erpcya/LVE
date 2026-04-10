@@ -28,7 +28,7 @@ import java.util.List;
 import org.compiere.impexp.BankStatementMatchInfo;
 import org.compiere.impexp.BankStatementMatcherInterface;
 import org.compiere.model.MBankStatementLine;
-import org.adempiere.core.domains.models.X_I_BankStatement;
+import org.compiere.model.X_I_BankStatement;
 import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Util;
@@ -43,12 +43,10 @@ public class CurrencyAndAmount implements BankStatementMatcherInterface {
 		
 	}
 
-	@Override
 	public BankStatementMatchInfo findMatch(MBankStatementLine bsl, List<Integer> includedPayments, List<Integer> exludedPayments) {
 		return null;
 	}
 
-	@Override
 	public BankStatementMatchInfo findMatch(X_I_BankStatement ibs, List<Integer> includedPayments, List<Integer> exludedPayments) {
 		StringBuffer paymentWhereClause = new StringBuffer();
 		if(includedPayments != null
@@ -174,5 +172,16 @@ public class CurrencyAndAmount implements BankStatementMatcherInterface {
 			}
 		}
 		return reference;
+	}
+
+	@Override
+	public BankStatementMatchInfo findMatch(MBankStatementLine bsl) {
+		return findMatch(bsl, null, null);
+	}
+
+	@Override
+	public BankStatementMatchInfo findMatch(X_I_BankStatement ibls) {
+		// TODO Auto-generated method stub
+		return findMatch(ibls, null, null);
 	}
 }

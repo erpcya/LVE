@@ -27,7 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.adempiere.exceptions.AdempiereException;
-import org.adempiere.core.domains.models.I_C_Order;
+import org.compiere.model.I_C_Order;
 import org.compiere.model.MBPartner;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInOut;
@@ -49,9 +49,8 @@ import org.compiere.util.DB;
 import org.compiere.util.Env;
 import org.compiere.util.Msg;
 import org.compiere.util.Util;
-import org.eevolution.distribution.model.MDDOrder;
-import org.eevolution.services.dsl.ProcessBuilder;
-
+import org.eevolution.model.MDDOrder;
+import org.eevolution.service.dsl.ProcessBuilder;
 /**
  * Added for hamdle custom columns for ADempiere core
  * @author Yamel Senih, ysenih@erpya.com, ERPCyA http://www.erpya.com

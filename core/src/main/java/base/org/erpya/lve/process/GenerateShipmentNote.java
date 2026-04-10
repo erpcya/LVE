@@ -18,7 +18,7 @@
 
 package org.erpya.lve.process;
 
-import org.eevolution.distribution.model.MDDOrder;
+import org.eevolution.model.MDDOrder;
 import org.erpya.lve.util.LVEUtil;
 
 /** Generated Process for (Generate Shipment Note)
