@@ -46,3 +46,5 @@ jobs:
           ORG_GRADLE_PROJECT_deployPublishUrl: https://maven.pkg.github.com/erpcya/LVE
           ORG_GRADLE_PROJECT_deployUsername: "${{ github.actor }}"
           ORG_GRADLE_PROJECT_deployPassword: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
