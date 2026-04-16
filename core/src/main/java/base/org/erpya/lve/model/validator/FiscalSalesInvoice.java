@@ -14,8 +14,8 @@
  ************************************************************************************/
 package org.erpya.lve.model.validator;
 
-import org.compiere.model.I_C_Invoice;
 import org.adempiere.exceptions.AdempiereException;
+import org.compiere.model.I_C_Invoice;
 import org.compiere.model.MClient;
 import org.compiere.model.MDocType;
 import org.compiere.model.MInvoice;
@@ -81,7 +81,7 @@ public class FiscalSalesInvoice implements ModelValidator {
 						&& MInvoice.DOCSTATUS_Completed.equals(invoice.getDocStatus())
 						&& documentType.get_ValueAsBoolean(LVEUtil.COLUMNNAME_IsFiscalDocument)) {
 
-					throw new AdempiereException("@ActionNotAllowed@ - @IsFiscalDocument@ @Completed@: " + invoice.getDocumentNo());
+					throw new AdempiereException("@ActionNotAllowedHere@ - @IsFiscalDocument@ @completed@: " + invoice.getDocumentNo());
 				}
 			}
 		}
