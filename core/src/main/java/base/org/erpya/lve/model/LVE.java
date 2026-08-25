@@ -463,7 +463,7 @@ public class LVE implements ModelValidator {
 				MBPartner businessPartner = (MBPartner) po;
 				if(type == TYPE_BEFORE_NEW
 						|| type == TYPE_BEFORE_CHANGE) {
-					boolean isValidationEnabled = MSysConfig.getBooleanValue(ENABLE_CODE_TYPE_VALIDATION, false, businessPartner.getAD_Client_ID(), businessPartner.getAD_Org_ID());
+					boolean isValidationEnabled = org.compiere.model.MSysConfig.getBooleanValue(LVEUtil.ENABLE_CODE_TYPE_VALIDATION, false, businessPartner.getAD_Client_ID(), businessPartner.getAD_Org_ID());
 					//	Validate without values
 					if(businessPartner.is_ValueChanged(I_C_BPartner.COLUMNNAME_Value)) {
 						String value = LVEUtil.processBusinessPartnerValue(businessPartner.getCtx(), businessPartner.getAD_Client_ID(), businessPartner.getAD_Org_ID(), businessPartner.getValue());
