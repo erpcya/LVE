@@ -4,21 +4,36 @@ plugins {
 	id 'signing'
 }
 
-sourceCompatibility = 1.11
+sourceCompatibility = 1.17
 def baseVersion = '3.9.4'
 def baseGroupId = 'io.github.adempiere'
+//  The fork's own release, not upstream's. 1.3.2 does not exist in
+//  erpcya's packages; adempiere-3.9.4-1.3.6 is what is published there.
+def withholdingVersion = 'adempiere-3.9.4-1.3.6'
 
 repositories {
     mavenLocal()
     mavenCentral()
+
+    //  withholding-engine is this organization's fork, published to its own
+    //  packages. Central carries upstream's, which does not have the changes this
+    //  repository is built against — and resolving it from there succeeds, which is
+    //  the part that makes it worth naming here.
+    maven {
+        url = "https://maven.pkg.github.com/erpcya/withholding-engine"
+        credentials {
+            username = System.getenv("GITHUB_DEPLOY_USER") ?: System.properties['deploy.user']
+            password = System.getenv("GITHUB_DEPLOY_TOKEN") ?: System.properties['deploy.token']
+        }
+    }
 }
 
 allprojects {
     tasks.withType(Javadoc).all { enabled = false }
 }
 
-sourceCompatibility = 1.11
-targetCompatibility = 1.11
+sourceCompatibility = 1.17
+targetCompatibility = 1.17
 
 dependencies {
    api fileTree(
@@ -34,7 +49,7 @@ dependencies {
 	api 'javax.mail:javax.mail-api:1.6.2'
 	// http://xml.apache.org/commons/#external
 	api 'xml-apis:xml-apis:2.0.2'
-	api "${baseGroupId}:withholding-engine:adempiere-3.9.4-1.3.2"
+	api "${baseGroupId}:withholding-engine:${withholdingVersion}"
 	api 'io.vavr:vavr:0.10.4'
 }
 
@@ -54,7 +69,13 @@ java {
 
 def entityType = 'LVE'
 group = "io.github.adempiere"
-version = findProperty("deployVersion") ?: "local-1.0.0"
+//  Both, in that order. deployVersion is what publish.yml sets;
+//  ADEMPIERE_LIBRARY_VERSION is what the platform's release-candidate workflow
+//  sets. A candidate built without this publishes local-1.0.0 and looks like it
+//  worked.
+version = findProperty("deployVersion")
+        ?: System.getenv("ADEMPIERE_LIBRARY_VERSION")
+        ?: "local-1.0.0"
 
 jar {
     manifest {
@@ -100,9 +121,11 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://github.com/adempiere/lve.git'
-                    developerConnection = 'scm:git:ssh://github.com/adempiere/lve.git'
-                    url = 'http://github.com/adempiere/lve'
+                    //  The fork, not upstream. Whoever follows this from a
+                    //  published artifact wants the source that produced it.
+                    connection = 'scm:git:git://github.com/erpcya/LVE.git'
+                    developerConnection = 'scm:git:ssh://github.com/erpcya/LVE.git'
+                    url = 'https://github.com/erpcya/LVE'
                 }
             }
 		}
