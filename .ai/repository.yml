@@ -22,12 +22,15 @@ upstream: https://github.com/adempiere/LVE
 terms:
   - localización Venezuela
   - IVA
-  - retención
-  - nómina
-  - impuesto
   - SENIAT
   - factura fiscal
-
+  - número de control
+  - libro de ventas
+  - libro de compras
+  - retención de IVA
+  - retención municipal
+  - archivo de nómina
+  - exportación bancaria
 # How this is built comes from standards/build-profiles.yml, matched by the gradle
 # wrapper in this tree. Nothing to declare unless this repository differs.
 
